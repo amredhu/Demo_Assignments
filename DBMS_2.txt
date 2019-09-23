@@ -1,0 +1,270 @@
+
+
+
+
+Microsoft Windows [Version 10.0.16299.1387]
+(c) 2017 Microsoft Corporation. All rights reserved.
+
+C:\Users\aredhu>sqlplus
+
+SQL*Plus: Release 18.0.0.0.0 - Production on Mon Sep 23 09:28:50 2019
+Version 18.4.0.0.0
+
+Copyright (c) 1982, 2018, Oracle.  All rights reserved.
+
+Enter user-name: dxc
+Enter password:
+Last Successful login time: Fri Sep 20 2019 12:19:10 +05:30
+
+Connected to:
+Oracle Database 18c Express Edition Release 18.0.0.0.0 - Production
+Version 18.4.0.0.0
+
+SQL> select * from tab;
+
+TNAME
+--------------------------------------------------------------------------------
+TABTYPE        CLUSTERID
+------------- ----------
+COLLEGE
+TABLE
+
+
+SQL> select user from dual;
+
+USER
+--------------------------------------------------------------------------------
+DXC
+
+
+
+
+SQL> select * from college;
+
+     CLGID CLGNAME              TEST
+---------- -------------------- -----
+         1 aa                   aa
+       242 SRMIST               100
+       223 Aashish              Pass
+       232 Harsh                Pass
+
+
+SQL> select user from college;
+
+USER
+--------------------------------------------------------------------------------
+DXC
+DXC
+DXC
+DXC
+
+SQL> desc dual;
+ Name                                      Null?    Type
+ ----------------------------------------- -------- ----------------------------
+ DUMMY                                              VARCHAR2(1)
+
+SQL> select * from dual;
+
+D
+-
+X
+
+SQL> select 'hello' from dual;
+
+'HELL
+-----
+hello
+
+SQL> select 2 + null from dual;
+
+    2+NULL
+----------
+
+
+SQL> desc college
+ Name                                      Null?    Type
+ ----------------------------------------- -------- ----------------------------
+ CLGID                                              NUMBER(38)
+ CLGNAME                                            VARCHAR2(20)
+ TEST                                               CHAR(5)
+
+
+SQL> alter table college
+  2  add constraint  pk primary key(clgid);
+
+Table altered.
+
+SQL> create table studFrTest(rollNo int primary key, clgCode int, sname varchar(20), constraint fk foreign key(clgCode) references college(clgid));
+
+Table created.
+
+
+SQL> create table emp(empName varchar(20) ,age int check(age between 18 and 50), addr varchar(50));
+
+Table created.
+
+
+
+SQL> insert into emp(age) values(18);
+
+1 row created.
+
+SQL> insert into emp(age) values(50);
+
+1 row created.
+
+SQL> create table dept(deptid int primary key, deptName varchar(20));
+
+Table created.
+
+SQL> insert into dept values(1,'Sales');
+
+1 row created.
+
+SQL> insert into dept values(2,'Marketing');
+
+1 row created.
+
+
+SQL> drop table emp;
+
+Table dropped.
+
+SQL> create table emp(empid int primary key, empName varchar(20), age int check(age between 18 and 50), deptId int references dept(deptid));
+
+Table created.
+
+SQL> create table empBackUp (empId int primary key, empName varchar(20), age int, deptId int);
+
+Table created.
+
+SQL> create trigger trgEmp after insert on emp
+  2  begin
+  3  insert into empBackUp values(empId, empName, age,deptId)
+SQL>
+SQL> create trigger trgEmp after insert on emp for each row
+  2  begin
+  3  insert into empBackUp(empid, empName,age, deptId) values(:new.empid,:new.empName,:new.age,:new.deptId)
+  4  ;end
+  5  ;
+  6  /
+
+Trigger created.
+
+SQL> insert into emp values(101, 'Tyagi', 23, 1);
+
+1 row created.
+
+SQL> select * from empBackUp;
+
+     EMPID EMPNAME                     AGE     DEPTID
+---------- -------------------- ---------- ----------
+       101 Tyagi                        23          1
+
+SQL> create table empBin (empid int primary key, empName varchar(20), age int, deptId int);
+
+Table created.
+
+SQL> create trigger trgBin before delete on emp for each row
+  2  begin
+  3  insert into empBin values(:new.empid,:new.empName,:new.age,:new.deptId);
+  4  end;
+  5  /
+
+Trigger created.
+
+SQL> insert into emp values(102,'Ashish',24,1);
+
+1 row created.
+
+
+
+SQL> select * from emp;
+
+     EMPID EMPNAME                     AGE     DEPTID
+---------- -------------------- ---------- ----------
+       101 Tyagi                        23          1
+       102 Ashish                       24          1
+
+
+
+SQL> drop trigger trgBin;
+
+Trigger dropped.
+
+SQL> create trigger trgBin before delete on emp for each row
+  2  begin
+  3  insert into empBin values(:old.empid,:old.empName,:old.age,:old.deptId);
+  4  end;
+  5  /
+
+Trigger created.
+
+SQL> delete from emp where empid=102;
+
+1 row deleted.
+
+SQL> select * from empBin;
+
+     EMPID EMPNAME                     AGE     DEPTID
+---------- -------------------- ---------- ----------
+       102 Ashish                       24          1
+
+SQL> create table custInfo(dob date);
+
+Table created.
+
+SQL> create trigger trgDate before insert on t for each row
+  2  begin
+  3  if :new.dob>sysdate then
+SQL> create trigger trgDate before insert on custInfo for each row
+  2  begin
+  3  if :new.dob>sysdate then
+  4  dbms_output.put_line("Error");
+  5  end if;
+  6  end;
+  7  /
+
+Warning: Trigger created with compilation errors.
+
+SQL> show errors;
+Errors for TRIGGER TRGDATE:
+
+LINE/COL ERROR
+-------- -----------------------------------------------------------------
+3/1      PL/SQL: Statement ignored
+3/23     PLS-00201: identifier 'Error' must be declared
+SQL> drop trigger trgDaTE;
+
+Trigger dropped.
+
+SQL> create trigger trgDate before insert on custInfo for each row
+  2  begin
+  3  if :new.dob>sysdate then
+  4  dbms_output.put_line('Error');
+  5  end if;
+  6  end;
+  7  /
+
+Trigger created.
+
+
+SQL> alter session set nls_date_format='dd/MON/yyyy';
+
+Session altered.
+
+
+SQL> insert into custInfo values('30-september-2019');
+Error
+
+1 row created.
+
+SQL> alter session set nls_date_format='dd-mm-yyyy';
+
+Session altered.
+
+SQL> insert into custinfo values('21-09-2019');
+
+1 row created.
+
+SQL>

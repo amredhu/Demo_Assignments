@@ -1,0 +1,46 @@
+Code- 2
+
+import java.util.Scanner;
+
+public class test {
+        public static void main(String[] args){
+            Scanner scan = new Scanner(System.in);
+            int given_number = scan.nextInt();
+            int count=0;
+            while(given_number>0){
+                given_number=given_number/10;
+                count++;
+            }
+
+            System.out.println(count);
+
+        }
+
+}
+
+
+-------------------------------------------------------------------------------------------
+Code- 1(Logic)
+
+public static void main(String []args){
+Scanner scan= new Scanner(System.in);	
+char[] given_string = scan.next();
+char[] reverse_string;
+int count_vowels=0;
+int count_consonant=0;
+int k=0;
+for (int i=given_string.length()-1;i>=0;i--)
+{
+	reverse_string[k]=given_string[i];	
+	k++;
+	if (given_string[i]=='a' || given_string[i]=='e' || given_string[i]=='i' || given_string[i]=='o' || given_string[i]=='u'){
+	count_vowels++;
+}
+else{
+count_consonant++;
+}
+}
+System.out.println(reverse_string);
+System.out.println(count_vowels);
+System.out.println(count_consonant);
+}
